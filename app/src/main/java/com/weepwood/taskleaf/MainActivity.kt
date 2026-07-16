@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TaskLeafApp(context: Context) {
     var darkMode by remember { mutableStateOf(false) }
