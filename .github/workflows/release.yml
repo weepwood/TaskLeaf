@@ -2,8 +2,10 @@ name: Release APK
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+    paths:
+      - '.github/workflows/release.yml'
   workflow_dispatch:
 
 permissions:
@@ -33,18 +35,34 @@ jobs:
         run: gradle --no-daemon --stacktrace assembleDebug
 
       - name: Prepare release APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk "TaskLeaf-${GITHUB_REF_NAME:-manual}-debug.apk"
+        run: cp app/build/outputs/apk/debug/app-debug.apk TaskLeaf-v1.0.0-debug.apk
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: taskleaf-release-apk
-          path: TaskLeaf-*-debug.apk
+          name: taskleaf-v1.0.0-apk
+          path: TaskLeaf-v1.0.0-debug.apk
           if-no-files-found: error
+          retention-days: 30
 
       - name: Publish GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: TaskLeaf-${{ github.ref_name }}-debug.apk
+          tag_name: v1.0.0
+          target_commitish: main
+          name: TaskLeaf v1.0.0
+          body: |
+            TaskLeaf 首个公开版本。
+
+            功能：
+            - 收件箱、今天和已完成任务视图
+            - 新增、完成、删除与搜索任务
+            - 截止日期和任务优先级
+            - 本地数据持久化
+            - Material 3 深色与浅色界面
+
+            安装说明：下载 `TaskLeaf-v1.0.0-debug.apk`，允许安装未知来源应用后进行安装。
+          files: TaskLeaf-v1.0.0-debug.apk
           generate_release_notes: true
+          draft: false
+          prerelease: false
